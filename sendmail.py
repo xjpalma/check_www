@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 """
 send an email through gmail
 Save this script to send-gmail.py,
@@ -26,6 +26,7 @@ import optparse
 import time
 import smtplib
 from email.message import EmailMessage
+import traceback
 
 # For guessing MIME type based on file name extension
 import mimetypes
@@ -73,6 +74,9 @@ def parse_args():
     if not opts.subject:
         parser.error("specify a subject with --subject 'my subject'")
 
+    if not opts.from_addr:
+        opts.from_addr = opts.user
+
     if not opts.to_addr_list:
         parser.error("specify at least one recipient with --to")
 
@@ -108,9 +112,9 @@ def create_message(from_addr, to_addr_list, cc_addr_list, subject, message, path
                 content = fp.read()
                 msg.add_attachment(content, maintype=mime_type, subtype=mime_subtype, filename=filename)
 
-        except Exception as e:
+        except Exception:
             print("Something went wrong with attachment:...")
-            print(e)
+            traceback.print_exc()
             sys.exit()
 
     return msg
@@ -130,9 +134,9 @@ def send_mail(user, password, from_addr, to_addr_list, cc_addr_list, subject, me
                 if attachment:
                     print(" with attachment: %s" % (attachment))
 
-        except Exception as e:
+        except Exception:
             print("Something went wrong:...")
-            print(e)
+            traceback.print_exc()
 
 
 def main():
